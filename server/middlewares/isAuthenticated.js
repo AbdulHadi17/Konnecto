@@ -17,6 +17,7 @@ const isAuthenticated = async(req,res,next)=>{
         }
 
         req.id = verify.userId;
+        next();
 
     } catch (error) {
         console.log(error);
@@ -24,3 +25,4 @@ const isAuthenticated = async(req,res,next)=>{
     }
 }
 
+export default isAuthenticated;

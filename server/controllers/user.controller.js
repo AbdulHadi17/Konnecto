@@ -1,7 +1,9 @@
-import User from '../models/user.model.js'
+import {User} from '../models/user.model.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import cloudinary from '../utils/cloudiary.js';
+import cloudinary from '../utils/cloudinary.js';
+import getDataUri from '../utils/datauri.js';
+
 
 export const Register = async (req, res) => {
 
@@ -13,7 +15,7 @@ export const Register = async (req, res) => {
             return res.status(401).json({ message: "Please Fill in the empty Fields", success: false });
         }
 
-        const user = await User.findOne(email);
+        const user = await User.findOne({email});
 
         if (user) {
             return res.status(401).json({ message: "Email Already in Use", success: false });
@@ -45,7 +47,7 @@ export const Login = async (req,res) => {
             return res.status(401).json({ message: "Please Fill in the empty Fields", success: false });
         }
 
-        const user = await User.findOne(email);
+        let user = await User.findOne({email});
 
         if (!user) {
             return res.status(401).json({ message: "User doesnt exist", success: false });
@@ -86,7 +88,7 @@ export const Logout = async(req,res)=>{
 
     try {
         
-        return res.cookie(token , "" , {maxAge:0}).json({
+        return res.cookie("token" , "" , {maxAge:0}).json({
             message:"Logged out Succesfully",
             success:true
         })
@@ -101,7 +103,7 @@ export const getProfile = async(req,res)=>{
 try {
     
 const userID = req.params.id;
-const user = await User.findById(userID);
+const user = await User.findById(userID).select("-password");
 
 return res.status(201).json({
     user,
@@ -121,10 +123,18 @@ export const editProfile = async(req,res)=>{
     try {
         
         const userID = req.id;
-        const user = User.findById(userID);
         const {bio,gender} = req.body;
-        const profilePic = req.file;
+        const profilePicture = req.file;
         let cloudResponse;
+        
+      
+        
+        if(profilePicture){
+            const fileURI = getDataUri(profilePicture);
+            cloudResponse = await cloudinary.uploader.upload(fileURI)
+        }
+        const user = await User.findById(userID).select("-password");
+
 
         if(!user){
             return res.status(401).json({
@@ -133,20 +143,16 @@ export const editProfile = async(req,res)=>{
             })
         }
 
-        if(profilePic){
-            const fileURI = getDataUri(profilePic);
-            cloudResponse = await cloudinary.uploader.upload(fileURI)
-        }
-
         if(bio) user.bio = bio;
         if(gender) user.gender = gender;
-        if(profilePic) user.profilePic = cloudinary.secure_url;
+        if(profilePicture) user.profilePic = cloudResponse.secure_url;
 
         await user.save();
 
         return res.status(201).json({
             message:"Profile Updated Sucesfully",
-            success:true
+            success:true,
+            user
         })
 
 
@@ -163,7 +169,7 @@ export const getSuggestedProfiles = async(req,res)=>{
     try {
         
 
-        const suggestedUsers = User.find({_id:{$ne:req.id}}).select("-password");
+        const suggestedUsers = await User.find({_id:{$ne:req.id}}).select("-password");
         if(!suggestedUsers){
             return res.status(401).json({
                 message:"No users to show currently",
@@ -191,8 +197,8 @@ try {
     const src = req.id;
     const target = req.params.id;
 
-    const srcUser = User.findById(src);
-    const targetUser = User.findById(target);
+    const srcUser = await User.findById(src);
+    const targetUser = await User.findById(target);
 
     if(src == target){
         return res.status(401).json({

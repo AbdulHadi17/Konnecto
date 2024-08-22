@@ -1,8 +1,9 @@
-import express, { urlencoded } from 'express';
+import express, { Router, urlencoded } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv'
 import connectDB from './utils/db.js';
+import userRouter from './routes/userRoute.js'
 
 dotenv.config({});
 
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(urlencoded({extended:true}));
 app.use(cors(corsOptions));
 app.use(cookieParser())
-
+app.use('/api/v1/user/' , userRouter)
 
 
 app.get('/' , (req,res)=>{
