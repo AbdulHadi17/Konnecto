@@ -63,7 +63,7 @@ export const Login = async (req,res) => {
 
         user = {
             username: user.username,
-            profilePic: user.profilePic,
+            profilePicture: user.profilePicture,
             bio: user.bio,
             gender: user.gender,
             followers: user.followers,
@@ -105,6 +105,13 @@ try {
 const userID = req.params.id;
 const user = await User.findById(userID).select("-password");
 
+if(!user){
+    return res.status(401).json({
+        message:'No User Found',
+        success:false
+    })
+}
+
 return res.status(201).json({
     user,
     success:true
@@ -145,7 +152,7 @@ export const editProfile = async(req,res)=>{
 
         if(bio) user.bio = bio;
         if(gender) user.gender = gender;
-        if(profilePicture) user.profilePic = cloudResponse.secure_url;
+        if(profilePicture) user.profilePicture = cloudResponse.secure_url;
 
         await user.save();
 
