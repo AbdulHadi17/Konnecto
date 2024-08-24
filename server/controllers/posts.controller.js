@@ -1,11 +1,11 @@
 import sharp from 'sharp';
-import cloudinary from '../utils/cloudinary';
+import cloudinary from '../utils/cloudinary.js';
 import {Post} from '../models/post.model.js'
 import { User } from '../models/user.model.js';
+import { Comment } from '../models/comment.model.js';
 
 export const addAPost = async(req,res)=>{
     try {
-        
         const {caption} = req.body;
         const image = req.file;
         const authorID = req.id;
@@ -13,7 +13,7 @@ export const addAPost = async(req,res)=>{
         if(!image){
             return res.status(401).json({
                 messsage:"Image is Required",
-                success:true
+                success:false
         })
         }
 
@@ -77,7 +77,7 @@ export const getAllPosts = async(req,res)=>{
 }
 
 
-export const getUserposts = async(res,res)=>{
+export const getUserposts = async(req,res)=>{
     try {
         
         const authorID = req.id;
@@ -187,12 +187,13 @@ export const addAComment = async(req,res)=>{
             text,
             author:userID,
             post:postID
-        }).populate({
-            path:'author' , select:'username , profilePicture'
         })
 
-        await post.comments.push(comment._id);
-        await post.save();
+        await Promise.all([comment.populate({
+            path:'author' , select:'username , profilePicture'
+        }),post.comments.push(comment._id), post.save() ]);
+
+        
 
         return res.status(201).json({
             message:'Comment added Succesfully',
