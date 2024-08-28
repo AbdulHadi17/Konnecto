@@ -7,14 +7,15 @@ import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 
-const SignUp = () => {
+const Login = () => {
+
 
 const navigate = useNavigate();
+
 
 const [loading, setloading] = useState(false);
 
 const [input, setinput] = useState({
-    username:"",
     email:"",
     password:""
 })
@@ -25,12 +26,11 @@ setinput({...input,[e.target.name]:e.target.value})
 
 
 const submitForm = async (e)=>{
-
-setloading(true);
+    setloading(true);
 e.preventDefault();
 
 try {
-    const res = await axios.post("http://localhost:3000/api/v1/user/register",input , {
+    const res = await axios.post("http://localhost:3000/api/v1/user/login",input , {
         headers:{
             'Content-Type':'application/json'
         },
@@ -40,10 +40,9 @@ try {
     
     if(res.data.success){
         toast.success(res.data.message)
-        navigate('/login');
-        // console.log(res.data.message)
+  navigate('/');
+//        console.log(res.data.message)
         setinput({
-            username:"",
             email:"",
             password:""
         })
@@ -65,16 +64,11 @@ try {
     <div className="upper text-blue-950 gap-2 flex flex-col mb-9">
 
         <h1 className="font-semibold text-center text-2xl "><span className='text-blue-700'>{"<"}</span>Konnecto<span className='text-blue-700'>{"/>"}</span></h1>
-    <p className="text-sm font-normal text-center">Signup to see photos & videos shared by your friends!</p>
+    <p className="text-sm font-normal text-center">Login to see photos & videos shared by your friends!</p>
     </div>
 
     <div className="inputs">
 
-        <div className="flex justify-center items-start gap-3 flex-col mt-5">
-
-            <Label>Username</Label>
-            <Input type="text" name="username" className="focus-visible:ring-transparent" value={input.username} onChange={handleChange}/>
-        </div>
         <div className="flex justify-center items-start gap-3 flex-col  mt-5">
 
             <Label>Email</Label>
@@ -86,15 +80,13 @@ try {
             <Input type="password" name="password" className="focus-visible:ring-transparent" value={input.password} onChange={handleChange}/>
         </div>
     </div>
-
-
-    {
-        loading?<Button  type="submit" className="w-full mt-8"><Loader2 className='mr-2 w-4 h-4 animate-spin'/>Please Wait...</Button>:
+{
+    loading?<Button  type="submit" className="w-full mt-8"> <Loader2 className='mr-2 w-4 h-4 animate-spin'/>Please Wait...</Button>:
     <Button type="submit" className="w-full mt-8">Submit</Button>
     }
-    
-    <Link to={"/login"}>
-    <p className="text-md text-center mt-3 cursor-pointer hover:underline underline-offset-4">Already have an account? <span className='text-purple-700'>Login</span></p>
+ 
+    <Link to={"/signup"}>
+    <p className="text-md text-center mt-3 cursor-pointer hover:underline underline-offset-4">Don't have an account? <span className='text-purple-700'>Signup</span></p>
     </Link>
     </form>
 
@@ -103,4 +95,4 @@ try {
   )
 }
 
-export default SignUp
+export default Login
