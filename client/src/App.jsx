@@ -4,6 +4,7 @@ import './App.css'
 import SignUp from './components/SignUp'
 import Login from './components/Login'
 import Main from './components/Main'
+import Home from './components/Home'
 
 
 
@@ -14,7 +15,7 @@ function App() {
     <>
     <Routes>
       <Route exact path='/' element={<Main/>}>
-      {/* <Route path='/hadi' element={<Login/>}/> */}
+      <Route path='/' element={<Home/>}/>
       </Route>
       <Route path='/signup' element={<SignUp/>}/>
       <Route path='/login' element={<Login/>}/>

@@ -5,8 +5,11 @@ import Sidebar from './Sidebar'
 const Main = () => {
   return (
     <>
+    <div className="flex">
+
     <Sidebar/>
     <Outlet></Outlet>
+    </div>
     </>
   )
 }
